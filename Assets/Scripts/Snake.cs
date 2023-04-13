@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,27 +10,41 @@ public class Snake : MonoBehaviour
 
     public Transform segmentPrefab;
 
+    public int initialSize = 4;
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Food"))
+        {
+            Grow();
+        }
+        else if (other.CompareTag("Obstacle"))
+        {
+            ResetGame();
+        }
+    }
+
     private void Start()
     {
-        this.segments = new List<Transform>();
-        this.segments.Add(this.transform);
+        segments = new List<Transform>();
+        ResetGame();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow) && direction != Vector2.down)
         {
             direction = Vector2.up;
         }
-        else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow) && direction != Vector2.up)
         {
             direction = Vector2.down;
         }
-        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) && direction != Vector2.right)
         {
             direction = Vector2.left;
         }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) && direction != Vector2.left)
         {
             direction = Vector2.right;
         }
@@ -55,11 +70,21 @@ public class Snake : MonoBehaviour
         segments.Add(segment);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+
+    private void ResetGame()
     {
-        if (other.CompareTag("Food"))
+        for (int i = 1; i < segments.Count; i++)
+        {
+            Destroy(segments[i].gameObject);
+        }
+        segments.Clear();
+        segments.Add(this.transform);
+
+        for (int i = 0; i < initialSize; i++)
         {
             Grow();
         }
+
+        transform.position = Vector3.zero;
     }
 }
